@@ -1609,6 +1609,7 @@ G_SaveGame
 
 void G_DoSaveGame (void) 
 { 
+#if 0
     char *savegame_file;
     char *temp_savegame_file;
     char *recovery_savegame_file;
@@ -1682,6 +1683,7 @@ void G_DoSaveGame (void)
 
     // draw the pattern into the back screen
     R_FillBackScreen ();	
+#endif
 } 
  
 

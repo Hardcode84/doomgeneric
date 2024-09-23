@@ -27,7 +27,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else
-#include <unistd.h>
+// #include <unistd.h>
 #endif
 
 #ifdef ORIGCODE
@@ -58,6 +58,10 @@
 #define DEFAULT_RAM 6 /* MiB */
 #define MIN_RAM     6  /* MiB */
 
+
+static int system(const char* cmd) {
+    return 1;
+}
 
 typedef struct atexit_listentry_s atexit_listentry_t;
 
