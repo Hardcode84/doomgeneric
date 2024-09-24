@@ -16,6 +16,7 @@
 //	Zone Memory Allocation. Neat.
 //
 
+#include <stddef.h>
 
 #include "z_zone.h"
 #include "i_system.h"

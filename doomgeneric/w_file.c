@@ -16,6 +16,7 @@
 //	WAD I/O functions.
 //
 
+#include <stddef.h>
 #include <stdio.h>
 
 #include "config.h"

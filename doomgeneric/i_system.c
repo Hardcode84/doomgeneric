@@ -23,13 +23,6 @@
 
 #include <stdarg.h>
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#else
-// #include <unistd.h>
-#endif
-
 #ifdef ORIGCODE
 #include "SDL.h"
 #endif
@@ -59,9 +52,6 @@
 #define MIN_RAM     6  /* MiB */
 
 
-static int system(const char* cmd) {
-    return 1;
-}
 
 typedef struct atexit_listentry_s atexit_listentry_t;
 
