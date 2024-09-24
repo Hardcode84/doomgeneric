@@ -43,6 +43,9 @@ void DG_SetWindowTitle(const char * title)
 
 int main(int argc, char **argv)
 {
+  uint32_t thread_id = __builtin_amdgcn_workitem_id_x();
+  if (thread_id == 0)
+  {
     doomgeneric_Create(argc, argv);
 
     while(true)
@@ -50,6 +53,7 @@ int main(int argc, char **argv)
         doomgeneric_Tick();
     }
     
+  }
 
     return 0;
 }
