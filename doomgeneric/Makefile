@@ -13,10 +13,10 @@ endif
 
 
 CC=~/llvm/llvm-install/bin/clang  # gcc or g++
-CFLAGS+=--target=amdgcn-amd-amdhsa -mcpu=gfx1030 -flto -nogpulib -fno-builtin-printf -fconvergent-functions -O3
-LDFLAGS+=-Wl,--gc-sections
+CFLAGS+=--target=nvptx64-nvidia-cuda -march=native -flto -nogpulib -fno-builtin-printf -fconvergent-functions -O1 --cuda-path=/usr/local/cuda
+#LDFLAGS+=-Wl,--gc-sections
 CFLAGS+=-Wall -DNORMALUNIX -DLINUX -DSNDSERV -D_DEFAULT_SOURCE # -DUSEASM
-LIBS+=-lc ~/llvm/llvm-install/lib/amdgcn-amd-amdhsa/crt1.o
+LIBS+=-lc ~/llvm/llvm-install/lib/nvptx64-nvidia-cuda/crt1.o
 
 # subdirectory for objects
 OBJDIR=build
@@ -36,7 +36,7 @@ clean:
 $(OUTPUT):	$(OBJS)
 	@echo [Linking $@]
 	$(VB)$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) \
-	-o $(OUTPUT) $(LIBS) -Wl,-Map,$(OUTPUT).map
+	-o $(OUTPUT) $(LIBS)
 	@echo [Size]
 	-$(CROSS_COMPILE)size $(OUTPUT)
 
