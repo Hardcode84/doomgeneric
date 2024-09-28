@@ -56,6 +56,7 @@ int main(int argc, char **argv, char **envp)
     for (int i = 0; ; i++)
     {
         doomgeneric_Tick();
+        doomgeneric_Draw();
 
         int interval = 10;
         if (i % interval == 0)
