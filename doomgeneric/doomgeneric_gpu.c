@@ -6,11 +6,19 @@
 #include "m_argv.h"
 #include "doomgeneric.h"
 
-
 #define NS_IN_MS 1000000L
 
-void DG_Init(){
+#define PROTECTED_VIS __attribute__ ((visibility ("protected")))
 
+int DG_GPU_ResX PROTECTED_VIS;
+int DG_GPU_Resy PROTECTED_VIS;
+void* DG_GPU_ScreenBuffer PROTECTED_VIS;
+
+void DG_Init()
+{
+  DG_GPU_ResX = DOOMGENERIC_RESX;
+  DG_GPU_Resy = DOOMGENERIC_RESY;
+  DG_GPU_ScreenBuffer = DG_ScreenBuffer;
 }
 
 void DG_DrawFrame()
@@ -43,6 +51,8 @@ void DG_SetWindowTitle(const char * title)
 
 }
 
+static void _gpu_host_barrier();
+
 int main(int argc, char **argv, char **envp)
 {
   // uint32_t thread_id = __builtin_amdgcn_workitem_id_x();
@@ -50,13 +60,16 @@ int main(int argc, char **argv, char **envp)
   if (thread_id == 0)
   {
     doomgeneric_Create(argc, argv);
+    _gpu_host_barrier();
 
     uint32_t time = DG_GetTicksMs();
     uint32_t last_tick = 0;
     for (int i = 0; ; i++)
     {
         doomgeneric_Tick();
+        _gpu_host_barrier();
         doomgeneric_Draw();
+        _gpu_host_barrier();
 
         int interval = 10;
         if (i % interval == 0)
