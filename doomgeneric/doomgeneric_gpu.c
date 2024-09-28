@@ -14,6 +14,11 @@ int DG_GPU_ResX PROTECTED_VIS;
 int DG_GPU_Resy PROTECTED_VIS;
 void* DG_GPU_ScreenBuffer PROTECTED_VIS;
 
+#define KEYQUEUE_SIZE 16
+unsigned short* DG_GPU_KeyQueue PROTECTED_VIS;
+#define KeyQueueReadIndex (DG_GPU_KeyQueue[KEYQUEUE_SIZE])
+#define KeyQueueWriteIndex (DG_GPU_KeyQueue[KEYQUEUE_SIZE + 1])
+
 void DG_Init()
 {
   DG_GPU_ResX = DOOMGENERIC_RESX;
@@ -43,6 +48,20 @@ uint32_t DG_GetTicksMs()
 
 int DG_GetKey(int* pressed, unsigned char* doomKey)
 {
+  if (KeyQueueReadIndex == KeyQueueWriteIndex){
+    //key queue is empty
+    return 0;
+  } else {
+    unsigned short keyData = DG_GPU_KeyQueue[KeyQueueReadIndex];
+    KeyQueueReadIndex++;
+    KeyQueueReadIndex %= KEYQUEUE_SIZE;
+
+    *pressed = keyData >> 8;
+    *doomKey = keyData & 0xFF;
+
+    return 1;
+  }
+
   return 0;
 }
 
@@ -51,7 +70,7 @@ void DG_SetWindowTitle(const char * title)
 
 }
 
-static void _gpu_host_barrier();
+extern void _gpu_host_barrier();
 
 int main(int argc, char **argv, char **envp)
 {
