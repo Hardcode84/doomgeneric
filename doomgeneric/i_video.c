@@ -37,6 +37,8 @@ static const char rcsid[] = "$Id: i_x.c,v 1.6 1997/02/03 22:45:10 b1 Exp $";
 
 #include "doomgeneric.h"
 
+#include "gpuintrin.h"
+
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -159,9 +161,16 @@ void cmap_to_fb(uint8_t *out, uint8_t *in, int in_pixels)
     uint32_t pix;
     uint16_t r, g, b;
 
-    for (i = 0; i < in_pixels; i++)
+    uint32_t thrd_id = _get_thread_id_x();
+    uint32_t thrd_count = _get_num_threads_x();
+
+    for (i = 0; i < in_pixels; i += thrd_count)
     {
-        uint8_t *in_current = in + i;
+        int local_id = i + thrd_id;
+        if (local_id >= in_pixels)
+            break;
+
+        uint8_t *in_current = in + local_id;
         c = colors[*in_current]; /* R:8 G:8 B:8 format! */
         r = (uint16_t) (c.r >> (8 - s_Fb.red.length));
         g = (uint16_t) (c.g >> (8 - s_Fb.green.length));
@@ -171,7 +180,7 @@ void cmap_to_fb(uint8_t *out, uint8_t *in, int in_pixels)
         pix |= b << s_Fb.blue.offset;
 
         uint32_t bytes_pp = s_Fb.bits_per_pixel / 8;
-        uint8_t *out_current = out + i * fb_scaling * bytes_pp;
+        uint8_t *out_current = out + local_id * fb_scaling * bytes_pp;
         for (k = 0; k < fb_scaling; k++)
         {
             for (j = 0; j < bytes_pp; j++)

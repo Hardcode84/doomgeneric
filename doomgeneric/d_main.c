@@ -188,25 +188,32 @@ void D_Display(void)
     redrawsbar = false;
 
     uint32_t thread_id = _get_thread_id_x();
-    if (thread_id == 0)
+    // change the view size if needed
+    if (setsizeneeded)
     {
-        // change the view size if needed
-        if (setsizeneeded)
+        if (thread_id == 0)
         {
             R_ExecuteSetViewSize();
             oldgamestate = -1; // force background redraw
             borderdrawcount = 3;
         }
+    }
 
-        // save the current screen if about to wipe
-        if (gamestate != wipegamestate)
+    // save the current screen if about to wipe
+    if (gamestate != wipegamestate)
+    {
+        wipe = true;
+        if (thread_id == 0)
         {
-            wipe = true;
             wipe_StartScreen(0, 0, SCREENWIDTH, SCREENHEIGHT);
         }
-        else
-            wipe = false;
+    }
+    else
+        wipe = false;
 
+
+    if (thread_id == 0)
+    {
         if (gamestate == GS_LEVEL && gametic)
             HU_Erase();
 
@@ -303,6 +310,7 @@ void D_Display(void)
 
 
     // normal update
+    _sync_threads();
     if (!wipe)
     {
         I_FinishUpdate(); // page flip or blit buffer

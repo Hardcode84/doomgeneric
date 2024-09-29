@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define SCREEN_RES_MULT 2
+#define SCREEN_RES_MULT 4
 
 #ifndef DOOMGENERIC_RESX
 #define DOOMGENERIC_RESX (320 * SCREEN_RES_MULT)
