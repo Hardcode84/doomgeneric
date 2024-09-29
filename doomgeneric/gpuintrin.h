@@ -30,7 +30,7 @@ static inline void _sync_threads()
 #define BROADCAST_FROM_THREAD0(var, T)                                         \
     do                                                                         \
     {                                                                          \
-        static T _local var_##_local_temp;                                     \
+        static T _local var##_local_temp;                                      \
         if (_get_thread_id_x() == 0)                                           \
             var_##_local_temp = var;                                           \
         _sync_threads();                                                       \
