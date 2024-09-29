@@ -76,7 +76,7 @@ boolean M_FileExists(char *filename)
     }
     else
     {
-        // If we can't open because the file is a directory, the 
+        // If we can't open because the file is a directory, the
         // "file" exists at least!
 
         return errno == EISDIR;
@@ -88,13 +88,13 @@ boolean M_FileExists(char *filename)
 //
 
 long M_FileLength(FILE *handle)
-{ 
+{
     long savedpos;
     long length;
 
     // save the current position in the file
     savedpos = ftell(handle);
-    
+
     // jump to the end and find the length
     fseek(handle, 0, SEEK_END);
     length = ftell(handle);
@@ -112,19 +112,19 @@ long M_FileLength(FILE *handle)
 boolean M_WriteFile(char *name, void *source, int length)
 {
     FILE *handle;
-    int	count;
-	
+    int count;
+
     handle = fopen(name, "wb");
 
     if (handle == NULL)
-	return false;
+        return false;
 
     count = fwrite(source, 1, length, handle);
     fclose(handle);
-	
+
     if (count < length)
-	return false;
-		
+        return false;
+
     return true;
 }
 
@@ -136,25 +136,25 @@ boolean M_WriteFile(char *name, void *source, int length)
 int M_ReadFile(char *name, byte **buffer)
 {
     FILE *handle;
-    int	count, length;
+    int count, length;
     byte *buf;
-	
+
     handle = fopen(name, "rb");
     if (handle == NULL)
-	I_Error ("Couldn't read file %s", name);
+        I_Error("Couldn't read file %s", name);
 
     // find the size of the file by seeking to the end and
     // reading the current position
 
     length = M_FileLength(handle);
-    
-    buf = Z_Malloc (length, PU_STATIC, NULL);
+
+    buf = Z_Malloc(length, PU_STATIC, NULL);
     count = fread(buf, 1, length, handle);
-    fclose (handle);
-	
+    fclose(handle);
+
     if (count < length)
-	I_Error ("Couldn't read file %s", name);
-		
+        I_Error("Couldn't read file %s", name);
+
     *buffer = buf;
     return length;
 }
@@ -189,10 +189,9 @@ char *M_TempFile(char *s)
 
 boolean M_StrToInt(const char *str, int *result)
 {
-    return sscanf(str, " 0x%x", result) == 1
-        || sscanf(str, " 0X%x", result) == 1
-        || sscanf(str, " 0%o", result) == 1
-        || sscanf(str, " %d", result) == 1;
+    return sscanf(str, " 0x%x", result) == 1 ||
+           sscanf(str, " 0X%x", result) == 1 ||
+           sscanf(str, " 0%o", result) == 1 || sscanf(str, " %d", result) == 1;
 }
 
 void M_ExtractFileBase(char *path, char *dest)
@@ -206,7 +205,7 @@ void M_ExtractFileBase(char *path, char *dest)
     // back up until a \ or the start
     while (src != path && *(src - 1) != DIR_SEPARATOR)
     {
-	src--;
+        src--;
     }
 
     filename = src;
@@ -223,12 +222,12 @@ void M_ExtractFileBase(char *path, char *dest)
     {
         if (length >= 8)
         {
-            printf("Warning: Truncated '%s' lump name to '%.8s'.\n",
-                   filename, dest);
+            printf("Warning: Truncated '%s' lump name to '%.8s'.\n", filename,
+                   dest);
             break;
         }
 
-	dest[length++] = toupper((int)*src++);
+        dest[length++] = toupper((int) *src++);
     }
 }
 
@@ -297,8 +296,7 @@ char *M_StringDuplicate(const char *orig)
 
     if (result == NULL)
     {
-        I_Error("Failed to duplicate string (length %i)\n",
-                strlen(orig));
+        I_Error("Failed to duplicate string (length %i)\n", strlen(orig));
     }
 
     return result;
@@ -342,7 +340,8 @@ char *M_StringReplace(const char *haystack, const char *needle,
         return NULL;
     }
 
-    dst = result; dst_len = result_len;
+    dst = result;
+    dst_len = result_len;
     p = haystack;
 
     while (*p != '\0')
@@ -357,7 +356,8 @@ char *M_StringReplace(const char *haystack, const char *needle,
         else
         {
             *dst = *p;
-            ++dst; --dst_len;
+            ++dst;
+            --dst_len;
             ++p;
         }
     }
@@ -408,16 +408,16 @@ boolean M_StringConcat(char *dest, const char *src, size_t dest_size)
 
 boolean M_StringStartsWith(const char *s, const char *prefix)
 {
-    return strlen(s) > strlen(prefix)
-        && strncmp(s, prefix, strlen(prefix)) == 0;
+    return strlen(s) > strlen(prefix) &&
+           strncmp(s, prefix, strlen(prefix)) == 0;
 }
 
 // Returns true if 's' ends with the specified suffix.
 
 boolean M_StringEndsWith(const char *s, const char *suffix)
 {
-    return strlen(s) >= strlen(suffix)
-        && strcmp(s + strlen(s) - strlen(suffix), suffix) == 0;
+    return strlen(s) >= strlen(suffix) &&
+           strcmp(s + strlen(s) - strlen(suffix), suffix) == 0;
 }
 
 // Return a newly-malloced string with all the strings given as arguments
@@ -533,4 +533,3 @@ char *M_OEMToUTF8(const char *oem)
 }
 
 #endif
-

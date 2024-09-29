@@ -48,8 +48,7 @@ int vanilla_keyboard_mapping = 1;
 static int shiftdown = 0;
 
 // Lookup table for mapping AT keycodes to their doom keycode
-static const char at_to_doom[] =
-{
+static const char at_to_doom[] = {
     /* 0x00 */ 0x00,
     /* 0x01 */ KEY_ESCAPE,
     /* 0x02 */ '1',
@@ -182,14 +181,12 @@ static const char at_to_doom[] =
 
 // Lookup table for mapping ASCII characters to their equivalent when
 // shift is pressed on an American layout keyboard:
-static const char shiftxform[] =
-{
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
-    11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
-    21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
-    31, ' ', '!', '"', '#', '$', '%', '&',
+static const char shiftxform[] = {
+    0,    1,   2,   3,   4,   5,   6,   7,   8,   9,   10,  11,  12,  13,  14,
+    15,   16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  28,  29,
+    30,   31,  ' ', '!', '"', '#', '$', '%', '&',
     '"', // shift-'
-    '(', ')', '*', '+',
+    '(',  ')', '*', '+',
     '<', // shift-,
     '_', // shift--
     '>', // shift-.
@@ -208,25 +205,23 @@ static const char shiftxform[] =
     ':', // shift-;
     '<',
     '+', // shift-=
-    '>', '?', '@',
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    '>',  '?', '@', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
+    'M',  'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
     '[', // shift-[
     '!', // shift-backslash - OH MY GOD DOES WATCOM SUCK
     ']', // shift-]
-    '"', '_',
+    '"',  '_',
     '\'', // shift-`
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
-    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-    '{', '|', '}', '~', 127
-};
+    'A',  'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O',
+    'P',  'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '{', '|', '}', '~',
+    127};
 
 
 static unsigned char TranslateKey(unsigned char key)
 {
-	return key;
+    return key;
 
-	/*
+    /*
     if (key < sizeof(at_to_doom))
         return at_to_doom[key];
     else
@@ -264,13 +259,17 @@ static void UpdateShiftStatus(int pressed, unsigned char key)
 {
     int change;
 
-    if (pressed) {
+    if (pressed)
+    {
         change = 1;
-    } else {
+    }
+    else
+    {
         change = -1;
     }
 
-    if (key == KEY_RSHIFT) {
+    if (key == KEY_RSHIFT)
+    {
         shiftdown += change;
     }
 }
@@ -282,13 +281,13 @@ void I_GetEvent(void)
     int pressed;
     unsigned char key;
 
-    
-	while (DG_GetKey(&pressed, &key))
+
+    while (DG_GetKey(&pressed, &key))
     {
         UpdateShiftStatus(pressed, key);
 
         // process event
-        
+
         if (pressed)
         {
             // data1 has the key pressed, data2 has the character
@@ -324,7 +323,7 @@ void I_GetEvent(void)
     }
 
 
-                /*
+    /*
             case SDL_MOUSEMOTION:
                 event.type = ev_mouse;
                 event.data1 = mouse_button_state;
@@ -338,4 +337,3 @@ void I_GetEvent(void)
 void I_InitInput(void)
 {
 }
-

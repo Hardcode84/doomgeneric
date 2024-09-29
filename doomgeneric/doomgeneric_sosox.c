@@ -28,9 +28,9 @@ static unsigned int g_key_queue_write_index = 0;
 static unsigned int g_key_queue_read_index = 0;
 
 
-static GR_WINDOW_ID  wid;
-static GR_GC_ID      gc;
-static unsigned char* windowBuffer = 0;
+static GR_WINDOW_ID wid;
+static GR_GC_ID gc;
+static unsigned char *windowBuffer = 0;
 static const int winSizeX = DOOMGENERIC_RESX;
 static const int winSizeY = DOOMGENERIC_RESY;
 static int button_down = 0;
@@ -42,44 +42,44 @@ static unsigned char convert_to_doom_key(unsigned char scancode)
 
     switch (scancode)
     {
-    case 0x9C:
-    case 0x1C:
-        key = KEY_ENTER;
-        break;
-    case 0x01:
-        key = KEY_ESCAPE;
-        break;
-    case 0xCB:
-    case 0x4B:
-        key = KEY_LEFTARROW;
-        break;
-    case 0xCD:
-    case 0x4D:
-        key = KEY_RIGHTARROW;
-        break;
-    case 0xC8:
-    case 0x48:
-        key = KEY_UPARROW;
-        break;
-    case 0xD0:
-    case 0x50:
-        key = KEY_DOWNARROW;
-        break;
-    case 0x1D:
-        key = KEY_FIRE;
-        break;
-    case 0x39:
-        key = KEY_USE;
-        break;
-    case 0x2A:
-    case 0x36:
-        key = KEY_RSHIFT;
-        break;
-    case 0x15:
-        key = 'y';
-        break;
-    default:
-        break;
+        case 0x9C:
+        case 0x1C:
+            key = KEY_ENTER;
+            break;
+        case 0x01:
+            key = KEY_ESCAPE;
+            break;
+        case 0xCB:
+        case 0x4B:
+            key = KEY_LEFTARROW;
+            break;
+        case 0xCD:
+        case 0x4D:
+            key = KEY_RIGHTARROW;
+            break;
+        case 0xC8:
+        case 0x48:
+            key = KEY_UPARROW;
+            break;
+        case 0xD0:
+        case 0x50:
+            key = KEY_DOWNARROW;
+            break;
+        case 0x1D:
+            key = KEY_FIRE;
+            break;
+        case 0x39:
+            key = KEY_USE;
+            break;
+        case 0x2A:
+        case 0x36:
+            key = KEY_RSHIFT;
+            break;
+        case 0x15:
+            key = 'y';
+            break;
+        default:
+            break;
     }
 
     return key;
@@ -101,17 +101,17 @@ struct termios orig_termios;
 
 void disable_raw_mode()
 {
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
 void enable_raw_mode()
 {
-  tcgetattr(STDIN_FILENO, &orig_termios);
-  atexit(disable_raw_mode);
-  struct termios raw = orig_termios;
-  raw.c_lflag &= ~(ECHO);
-  raw.c_cc[VMIN] = 0;
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    tcgetattr(STDIN_FILENO, &orig_termios);
+    atexit(disable_raw_mode);
+    struct termios raw = orig_termios;
+    raw.c_lflag &= ~(ECHO);
+    raw.c_cc[VMIN] = 0;
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
 void DG_Init()
@@ -124,24 +124,20 @@ void DG_Init()
 
     gc = GrNewGC();
     GrSetGCUseBackground(gc, GR_FALSE);
-    GrSetGCForeground(gc, MWRGB( 255, 0, 0 ));
+    GrSetGCForeground(gc, MWRGB(255, 0, 0));
 
-    wid = GrNewBufferedWindow(GR_WM_PROPS_APPFRAME |
-                        GR_WM_PROPS_CAPTION  |
-                        GR_WM_PROPS_CLOSEBOX |
-                        GR_WM_PROPS_BUFFER_MMAP |
-                        GR_WM_PROPS_BUFFER_BGRA,
-                        "Doom",
-                        GR_ROOT_WINDOW_ID, 
-                        50, 50, winSizeX, winSizeY, MWRGB( 255, 255, 255 ));
+    wid = GrNewBufferedWindow(
+        GR_WM_PROPS_APPFRAME | GR_WM_PROPS_CAPTION | GR_WM_PROPS_CLOSEBOX |
+            GR_WM_PROPS_BUFFER_MMAP | GR_WM_PROPS_BUFFER_BGRA,
+        "Doom", GR_ROOT_WINDOW_ID, 50, 50, winSizeX, winSizeY,
+        MWRGB(255, 255, 255));
 
-    GrSelectEvents(wid, GR_EVENT_MASK_EXPOSURE | 
-                        GR_EVENT_MASK_TIMER |
-                        GR_EVENT_MASK_CLOSE_REQ |
-                        GR_EVENT_MASK_BUTTON_DOWN |
-                        GR_EVENT_MASK_BUTTON_UP);
+    GrSelectEvents(wid, GR_EVENT_MASK_EXPOSURE | GR_EVENT_MASK_TIMER |
+                            GR_EVENT_MASK_CLOSE_REQ |
+                            GR_EVENT_MASK_BUTTON_DOWN |
+                            GR_EVENT_MASK_BUTTON_UP);
 
-    GrMapWindow (wid);
+    GrMapWindow(wid);
 
     windowBuffer = GrOpenClientFramebuffer(wid);
 
@@ -152,7 +148,7 @@ void DG_Init()
     if (g_keyboard_fd >= 0)
     {
         //enter non-blocking mode
-        ioctl(g_keyboard_fd, 1, (void*)1);
+        ioctl(g_keyboard_fd, 1, (void *) 1);
     }
 }
 
@@ -193,28 +189,29 @@ void DG_DrawFrame()
 
         switch (event.type)
         {
-        case GR_EVENT_TYPE_BUTTON_DOWN:
-            button_down = 1;
-            break;
-        case GR_EVENT_TYPE_BUTTON_UP:
-            button_down = 0;
-            break;
+            case GR_EVENT_TYPE_BUTTON_DOWN:
+                button_down = 1;
+                break;
+            case GR_EVENT_TYPE_BUTTON_UP:
+                button_down = 0;
+                break;
 
-        case GR_EVENT_TYPE_CLOSE_REQ:
-            GrClose();
-            exit (0);
-            break;
-        case GR_EVENT_TYPE_EXPOSURE:
-            break;
-        case GR_EVENT_TYPE_TIMER:
-            
-            break;
+            case GR_EVENT_TYPE_CLOSE_REQ:
+                GrClose();
+                exit(0);
+                break;
+            case GR_EVENT_TYPE_EXPOSURE:
+                break;
+            case GR_EVENT_TYPE_TIMER:
+
+                break;
         }
     }
 
     //if (button_down == 0)
     {
-        memcpy(windowBuffer, DG_ScreenBuffer, DOOMGENERIC_RESX * DOOMGENERIC_RESY * 4);
+        memcpy(windowBuffer, DG_ScreenBuffer,
+               DOOMGENERIC_RESX * DOOMGENERIC_RESY * 4);
 
         GrFlushWindow(wid);
     }
@@ -232,7 +229,7 @@ uint32_t DG_GetTicksMs()
     return get_uptime_ms();
 }
 
-int DG_GetKey(int* pressed, unsigned char* doomKey)
+int DG_GetKey(int *pressed, unsigned char *doomKey)
 {
     if (g_key_queue_read_index == g_key_queue_write_index)
     {
@@ -253,7 +250,7 @@ int DG_GetKey(int* pressed, unsigned char* doomKey)
     }
 }
 
-void DG_SetWindowTitle(const char * title)
+void DG_SetWindowTitle(const char *title)
 {
     GrSetWindowTitle(wid, title);
 }
@@ -262,11 +259,11 @@ int main(int argc, char **argv)
 {
     doomgeneric_Create(argc, argv);
 
-    for (int i = 0; ; i++)
+    for (int i = 0;; i++)
     {
         doomgeneric_Tick();
     }
-    
+
 
     return 0;
 }
