@@ -310,37 +310,46 @@ void D_Display(void)
 
 
     // normal update
-    _sync_threads();
     if (!wipe)
     {
+        _sync_threads();
         I_FinishUpdate(); // page flip or blit buffer
         return;
     }
 
+    static int wipestart_temp;
     if (thread_id == 0)
     {
         // wipe update
         wipe_EndScreen(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
-        wipestart = I_GetTime() - 1;
+        wipestart_temp = I_GetTime() - 1;
+    }
+    _sync_threads();
+    wipestart = wipestart_temp;
 
+    static boolean done_temp;
+    do
+    {
         do
         {
-            do
-            {
-                nowtime = I_GetTime();
-                tics = nowtime - wipestart;
-                I_Sleep(1);
-            } while (tics <= 0);
+            nowtime = I_GetTime();
+            tics = nowtime - wipestart;
+            I_Sleep(1);
+        } while (tics <= 0);
 
-            wipestart = nowtime;
-            done = wipe_ScreenWipe(wipe_Melt, 0, 0, SCREENWIDTH, SCREENHEIGHT,
-                                   tics);
-            I_UpdateNoBlit();
-            M_Drawer();       // menu is drawn even on top of wipes
-            I_FinishUpdate(); // page flip or blit buffer
-        } while (!done);
-    }
+        wipestart = nowtime;
+        if (thread_id == 0)
+        {
+            done_temp = wipe_ScreenWipe(wipe_Melt, 0, 0, SCREENWIDTH,
+                                        SCREENHEIGHT, tics);
+        }
+        _sync_threads();
+        done = done_temp;
+        I_UpdateNoBlit();
+        M_Drawer();       // menu is drawn even on top of wipes
+        I_FinishUpdate(); // page flip or blit buffer
+    } while (!done);
 }
 
 //

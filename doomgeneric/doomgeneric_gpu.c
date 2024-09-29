@@ -30,8 +30,12 @@ void DG_Init()
     DG_GPU_ScreenBuffer = DG_ScreenBuffer;
 }
 
+void *DG_GPU_DrawFrame PROTECTED_VIS = NULL;
+
 void DG_DrawFrame()
 {
+    if (_get_thread_id_x() == 0)
+        rpc_host_call(DG_GPU_DrawFrame, NULL, 0);
 }
 
 void DG_SleepMs(uint32_t ms)
