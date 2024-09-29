@@ -41,12 +41,12 @@
 #include "w_wad.h"
 #include "z_zone.h"
 
-#define MAXMIDLENGTH (96 * 1024)
+#define MAXMIDLENGTH     (96 * 1024)
 #define MID_HEADER_MAGIC "MThd"
 #define MUS_HEADER_MAGIC "MUS\x1a"
 
 #define FLAC_HEADER "fLaC"
-#define OGG_HEADER "OggS"
+#define OGG_HEADER  "OggS"
 
 // Looping Vorbis metadata tag names. These have been defined by ZDoom
 // for specifying the start and end positions for looping music tracks
@@ -56,12 +56,12 @@
 #define LOOP_END_TAG   "LOOP_END"
 
 // FLAC metadata headers that we care about.
-#define FLAC_STREAMINFO      0
-#define FLAC_VORBIS_COMMENT  4
+#define FLAC_STREAMINFO     0
+#define FLAC_VORBIS_COMMENT 4
 
 // Ogg metadata headers that we care about.
-#define OGG_ID_HEADER        1
-#define OGG_COMMENT_HEADER   3
+#define OGG_ID_HEADER      1
+#define OGG_COMMENT_HEADER 3
 
 // Structure for music substitution.
 // We store a mapping based on SHA1 checksum -> filename of substitute music
@@ -90,19 +90,14 @@ typedef struct
 static subst_music_t *subst_music = NULL;
 static unsigned int subst_music_len = 0;
 
-static const char *subst_config_filenames[] =
-{
-    "doom1-music.cfg",
-    "doom2-music.cfg",
-    "tnt-music.cfg",
-    "heretic-music.cfg",
-    "hexen-music.cfg",
-    "strife-music.cfg",
+static const char *subst_config_filenames[] = {
+    "doom1-music.cfg",   "doom2-music.cfg", "tnt-music.cfg",
+    "heretic-music.cfg", "hexen-music.cfg", "strife-music.cfg",
 };
 
 static boolean music_initialized = false;
 
-// If this is true, this module initialized SDL sound and has the 
+// If this is true, this module initialized SDL sound and has the
 // responsibility to shut it down
 
 static boolean sdl_was_initialized = false;
@@ -139,7 +134,7 @@ static unsigned int ParseVorbisTime(unsigned int samplerate_hz, char *value)
 
     if (strchr(value, ':') == NULL)
     {
-	return atoi(value);
+        return atoi(value);
     }
 
     result = 0;
@@ -149,7 +144,8 @@ static unsigned int ParseVorbisTime(unsigned int samplerate_hz, char *value)
     {
         if (*p == '.' || *p == ':')
         {
-            c = *p; *p = '\0';
+            c = *p;
+            *p = '\0';
             result = result * 60 + atoi(num_start);
             num_start = p + 1;
             *p = c;
@@ -157,8 +153,8 @@ static unsigned int ParseVorbisTime(unsigned int samplerate_hz, char *value)
 
         if (*p == '.')
         {
-            return result * samplerate_hz
-	         + (unsigned int) (atof(p) * samplerate_hz);
+            return result * samplerate_hz +
+                   (unsigned int) (atof(p) * samplerate_hz);
         }
     }
 
@@ -202,7 +198,7 @@ static void ParseVorbisComments(file_metadata_t *metadata, FILE *fs)
     // We must have read the sample rate already from an earlier header.
     if (metadata->samplerate_hz == 0)
     {
-	return;
+        return;
     }
 
     // Skip the starting part we don't care about.
@@ -212,7 +208,7 @@ static void ParseVorbisComments(file_metadata_t *metadata, FILE *fs)
     }
     if (fseek(fs, LONG(buf), SEEK_CUR) != 0)
     {
-	return;
+        return;
     }
 
     // Read count field for number of comments.
@@ -227,16 +223,15 @@ static void ParseVorbisComments(file_metadata_t *metadata, FILE *fs)
     {
         // Read length of comment.
         if (fread(&buf, 4, 1, fs) < 1)
-	{
+        {
             return;
-	}
+        }
 
         comment_len = LONG(buf);
 
         // Read actual comment data into string buffer.
         comment = calloc(1, comment_len + 1);
-        if (comment == NULL
-         || fread(comment, 1, comment_len, fs) < comment_len)
+        if (comment == NULL || fread(comment, 1, comment_len, fs) < comment_len)
         {
             free(comment);
             break;
@@ -259,8 +254,7 @@ static void ParseFlacStreaminfo(file_metadata_t *metadata, FILE *fs)
     }
 
     // We only care about sample rate and song length.
-    metadata->samplerate_hz = (buf[10] << 12) | (buf[11] << 4)
-                            | (buf[12] >> 4);
+    metadata->samplerate_hz = (buf[10] << 12) | (buf[11] << 4) | (buf[12] >> 4);
     // Song length is actually a 36 bit field, but 32 bits should be
     // enough for everybody.
     //metadata->song_length = (buf[14] << 24) | (buf[15] << 16)
@@ -325,8 +319,8 @@ static void ParseOggIdHeader(file_metadata_t *metadata, FILE *fs)
         return;
     }
 
-    metadata->samplerate_hz = (buf[8] << 24) | (buf[7] << 16)
-                            | (buf[6] << 8) | buf[5];
+    metadata->samplerate_hz =
+        (buf[8] << 24) | (buf[7] << 16) | (buf[6] << 8) | buf[5];
 }
 
 static void ParseOggFile(file_metadata_t *metadata, FILE *fs)
@@ -340,9 +334,9 @@ static void ParseOggFile(file_metadata_t *metadata, FILE *fs)
 
     for (offset = 0; offset < 100 * 1024; ++offset)
     {
-	// buf[] is used as a sliding window. Each iteration, we
-	// move the buffer one byte to the left and read an extra
-	// byte onto the end.
+        // buf[] is used as a sliding window. Each iteration, we
+        // move the buffer one byte to the left and read an extra
+        // byte onto the end.
         memmove(buf, buf + 1, sizeof(buf) - 1);
 
         if (fread(&buf[6], 1, 1, fs) < 1)
@@ -358,7 +352,7 @@ static void ParseOggFile(file_metadata_t *metadata, FILE *fs)
                     ParseOggIdHeader(metadata, fs);
                     break;
                 case OGG_COMMENT_HEADER:
-		    ParseVorbisComments(metadata, fs);
+                    ParseVorbisComments(metadata, fs);
                     break;
                 default:
                     break;
@@ -460,8 +454,7 @@ static char *GetSubstituteMusicFile(void *data, size_t data_len)
 static void AddSubstituteMusic(subst_music_t *subst)
 {
     ++subst_music_len;
-    subst_music =
-        realloc(subst_music, sizeof(subst_music_t) * subst_music_len);
+    subst_music = realloc(subst_music, sizeof(subst_music_t) * subst_music_len);
     memcpy(&subst_music[subst_music_len - 1], subst, sizeof(subst_music_t));
 }
 
@@ -548,7 +541,8 @@ static char *ParseSubstituteLine(char *filename, char *line)
     }
 
     // Skip leading spaces.
-    for (p = line; *p != '\0' && isspace(*p); ++p);
+    for (p = line; *p != '\0' && isspace(*p); ++p)
+        ;
 
     // Empty line? This includes comment lines now that comments have
     // been stripped.
@@ -587,7 +581,8 @@ static char *ParseSubstituteLine(char *filename, char *line)
     }
 
     // Skip spaces.
-    for (; *p != '\0' && isspace(*p); ++p);
+    for (; *p != '\0' && isspace(*p); ++p)
+        ;
 
     if (*p != '=')
     {
@@ -597,7 +592,8 @@ static char *ParseSubstituteLine(char *filename, char *line)
     ++p;
 
     // Skip spaces.
-    for (; *p != '\0' && isspace(*p); ++p);
+    for (; *p != '\0' && isspace(*p); ++p)
+        ;
 
     // We're now at the filename. Cut off trailing space characters.
     while (strlen(p) > 0 && isspace(p[strlen(p) - 1]))
@@ -710,8 +706,8 @@ static boolean IsMusicLump(int lumpnum)
 
     data = W_CacheLumpNum(lumpnum, PU_STATIC);
 
-    result = memcmp(data, MUS_HEADER_MAGIC, 4) == 0
-          || memcmp(data, MID_HEADER_MAGIC, 4) == 0;
+    result = memcmp(data, MUS_HEADER_MAGIC, 4) == 0 ||
+             memcmp(data, MID_HEADER_MAGIC, 4) == 0;
 
     W_ReleaseLumpNum(lumpnum);
 
@@ -892,15 +888,15 @@ static boolean I_SDL_InitMusic(void)
     {
         const SDL_version *v = Mix_Linked_Version();
 
-        if (SDL_VERSIONNUM(v->major, v->minor, v->patch)
-          < SDL_VERSIONNUM(1, 2, 11))
+        if (SDL_VERSIONNUM(v->major, v->minor, v->patch) <
+            SDL_VERSIONNUM(1, 2, 11))
         {
             printf("\n"
-               "                   *** WARNING ***\n"
-               "      You are using an old version of SDL_mixer.\n"
-               "      Music playback on this version may cause crashes\n"
-               "      under OS X and is disabled by default.\n"
-               "\n");
+                   "                   *** WARNING ***\n"
+                   "      You are using an old version of SDL_mixer.\n"
+                   "      Music playback on this version may cause crashes\n"
+                   "      under OS X and is disabled by default.\n"
+                   "\n");
         }
     }
 #endif
@@ -1037,7 +1033,7 @@ static void I_SDL_PlaySong(void *handle, boolean looping)
     {
         loops = 1;
         SDL_LockAudio();
-        current_track_pos = 0;  // start of track
+        current_track_pos = 0; // start of track
         SDL_UnlockAudio();
     }
 
@@ -1097,7 +1093,7 @@ static void I_SDL_UnRegisterSong(void *handle)
     Mix_FreeMusic(music);
 }
 
-// Determine whether memory block is a .mid file 
+// Determine whether memory block is a .mid file
 
 static boolean IsMid(byte *mem, int len)
 {
@@ -1177,7 +1173,7 @@ static void *I_SDL_RegisterSong(void *data, int len)
     }
     else
     {
-	// Assume a MUS file and try to convert
+        // Assume a MUS file and try to convert
 
         ConvertMus(data, len, filename);
     }
@@ -1238,8 +1234,8 @@ static double GetMusicPosition(void)
 
 static void RestartCurrentTrack(void)
 {
-    double start = (double) file_metadata.start_time
-                 / file_metadata.samplerate_hz;
+    double start =
+        (double) file_metadata.start_time / file_metadata.samplerate_hz;
 
     // If the track is playing on loop then reset to the start point.
     // Otherwise we need to stop the track.
@@ -1270,8 +1266,8 @@ static void I_SDL_PollMusic(void)
 {
     if (playing_substitute && file_metadata.valid)
     {
-        double end = (double) file_metadata.end_time
-                   / file_metadata.samplerate_hz;
+        double end =
+            (double) file_metadata.end_time / file_metadata.samplerate_hz;
 
         // If we have reached the loop end point then we have to take action.
         if (file_metadata.end_time >= 0 && GetMusicPosition() >= end)
@@ -1287,30 +1283,17 @@ static void I_SDL_PollMusic(void)
     }
 }
 
-static snddevice_t music_sdl_devices[] =
-{
-    SNDDEVICE_PAS,
-    SNDDEVICE_GUS,
-    SNDDEVICE_WAVEBLASTER,
-    SNDDEVICE_SOUNDCANVAS,
-    SNDDEVICE_GENMIDI,
-    SNDDEVICE_AWE32,
+static snddevice_t music_sdl_devices[] = {
+    SNDDEVICE_PAS,         SNDDEVICE_GUS,     SNDDEVICE_WAVEBLASTER,
+    SNDDEVICE_SOUNDCANVAS, SNDDEVICE_GENMIDI, SNDDEVICE_AWE32,
 };
 
-music_module_t DG_music_module =
-{
-    music_sdl_devices,
-    arrlen(music_sdl_devices),
-    I_SDL_InitMusic,
-    I_SDL_ShutdownMusic,
-    I_SDL_SetMusicVolume,
-    I_SDL_PauseSong,
-    I_SDL_ResumeSong,
-    I_SDL_RegisterSong,
-    I_SDL_UnRegisterSong,
-    I_SDL_PlaySong,
-    I_SDL_StopSong,
-    I_SDL_MusicIsPlaying,
+music_module_t DG_music_module = {
+    music_sdl_devices,    arrlen(music_sdl_devices),
+    I_SDL_InitMusic,      I_SDL_ShutdownMusic,
+    I_SDL_SetMusicVolume, I_SDL_PauseSong,
+    I_SDL_ResumeSong,     I_SDL_RegisterSong,
+    I_SDL_UnRegisterSong, I_SDL_PlaySong,
+    I_SDL_StopSong,       I_SDL_MusicIsPlaying,
     I_SDL_PollMusic,
 };
-

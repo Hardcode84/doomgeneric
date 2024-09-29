@@ -17,7 +17,7 @@
 #include <soso.h>
 
 static int FrameBufferFd = -1;
-static int* FrameBuffer = 0;
+static int *FrameBuffer = 0;
 
 static int KeyboardFd = -1;
 
@@ -46,44 +46,44 @@ static unsigned char convertToDoomKey(unsigned char scancode)
 
     switch (scancode)
     {
-    case 0x9C:
-    case 0x1C:
-        key = KEY_ENTER;
-        break;
-    case 0x01:
-        key = KEY_ESCAPE;
-        break;
-    case 0xCB:
-    case 0x4B:
-        key = KEY_LEFTARROW;
-        break;
-    case 0xCD:
-    case 0x4D:
-        key = KEY_RIGHTARROW;
-        break;
-    case 0xC8:
-    case 0x48:
-        key = KEY_UPARROW;
-        break;
-    case 0xD0:
-    case 0x50:
-        key = KEY_DOWNARROW;
-        break;
-    case 0x1D:
-        key = KEY_FIRE;
-        break;
-    case 0x39:
-        key = KEY_USE;
-        break;
-    case 0x2A:
-    case 0x36:
-        key = KEY_RSHIFT;
-        break;
-    case 0x15:
-        key = 'y';
-        break;
-    default:
-        break;
+        case 0x9C:
+        case 0x1C:
+            key = KEY_ENTER;
+            break;
+        case 0x01:
+            key = KEY_ESCAPE;
+            break;
+        case 0xCB:
+        case 0x4B:
+            key = KEY_LEFTARROW;
+            break;
+        case 0xCD:
+        case 0x4D:
+            key = KEY_RIGHTARROW;
+            break;
+        case 0xC8:
+        case 0x48:
+            key = KEY_UPARROW;
+            break;
+        case 0xD0:
+        case 0x50:
+            key = KEY_DOWNARROW;
+            break;
+        case 0x1D:
+            key = KEY_FIRE;
+            break;
+        case 0x39:
+            key = KEY_USE;
+            break;
+        case 0x2A:
+        case 0x36:
+            key = KEY_RSHIFT;
+            break;
+        case 0x15:
+            key = 'y';
+            break;
+        default:
+            break;
     }
 
     return key;
@@ -91,15 +91,15 @@ static unsigned char convertToDoomKey(unsigned char scancode)
 
 static void addKeyToQueue(int pressed, unsigned char keyCode)
 {
-	//printf("key hex %x decimal %d\n", keyCode, keyCode);
+    //printf("key hex %x decimal %d\n", keyCode, keyCode);
 
-        unsigned char key = convertToDoomKey(keyCode);
+    unsigned char key = convertToDoomKey(keyCode);
 
-        unsigned short keyData = (pressed << 8) | key;
+    unsigned short keyData = (pressed << 8) | key;
 
-        s_KeyQueue[s_KeyQueueWriteIndex] = keyData;
-        s_KeyQueueWriteIndex++;
-        s_KeyQueueWriteIndex %= KEYQUEUE_SIZE;
+    s_KeyQueue[s_KeyQueueWriteIndex] = keyData;
+    s_KeyQueueWriteIndex++;
+    s_KeyQueueWriteIndex %= KEYQUEUE_SIZE;
 }
 
 
@@ -107,18 +107,18 @@ struct termios orig_termios;
 
 void disableRawMode()
 {
-  //printf("returning original termios\n");
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+    //printf("returning original termios\n");
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
 }
 
 void enableRawMode()
 {
-  tcgetattr(STDIN_FILENO, &orig_termios);
-  atexit(disableRawMode);
-  struct termios raw = orig_termios;
-  raw.c_lflag &= ~(ECHO);
-  raw.c_cc[VMIN] = 0;
-  tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+    tcgetattr(STDIN_FILENO, &orig_termios);
+    atexit(disableRawMode);
+    struct termios raw = orig_termios;
+    raw.c_lflag &= ~(ECHO);
+    raw.c_cc[VMIN] = 0;
+    tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
 
 void DG_Init()
@@ -141,9 +141,10 @@ void DG_Init()
             exit(1);
         }
 
-        FrameBuffer = mmap(NULL, s_ScreenWidth * s_ScreenHeight * 4, PROT_READ | PROT_WRITE, 0, FrameBufferFd, 0);
+        FrameBuffer = mmap(NULL, s_ScreenWidth * s_ScreenHeight * 4,
+                           PROT_READ | PROT_WRITE, 0, FrameBufferFd, 0);
 
-        if (FrameBuffer != (int*)-1)
+        if (FrameBuffer != (int *) -1)
         {
             printf("FrameBuffer mmap success\n");
         }
@@ -164,7 +165,7 @@ void DG_Init()
     if (KeyboardFd >= 0)
     {
         //enter non-blocking mode
-        ioctl(KeyboardFd, 1, (void*)1);
+        ioctl(KeyboardFd, 1, (void *) 1);
     }
 
     int argPosX = 0;
@@ -217,7 +218,9 @@ void DG_DrawFrame()
     {
         for (int i = 0; i < DOOMGENERIC_RESY; ++i)
         {
-            memcpy(FrameBuffer + s_PositionX + (i + s_PositionY) * s_ScreenWidth, DG_ScreenBuffer + i * DOOMGENERIC_RESX, DOOMGENERIC_RESX * 4);
+            memcpy(
+                FrameBuffer + s_PositionX + (i + s_PositionY) * s_ScreenWidth,
+                DG_ScreenBuffer + i * DOOMGENERIC_RESX, DOOMGENERIC_RESX * 4);
         }
     }
 
@@ -234,7 +237,7 @@ uint32_t DG_GetTicksMs()
     return get_uptime_ms();
 }
 
-int DG_GetKey(int* pressed, unsigned char* doomKey)
+int DG_GetKey(int *pressed, unsigned char *doomKey)
 {
     if (s_KeyQueueReadIndex == s_KeyQueueWriteIndex)
     {
@@ -255,7 +258,7 @@ int DG_GetKey(int* pressed, unsigned char* doomKey)
     }
 }
 
-void DG_SetWindowTitle(const char * title)
+void DG_SetWindowTitle(const char *title)
 {
 }
 
@@ -263,11 +266,11 @@ int main(int argc, char **argv)
 {
     doomgeneric_Create(argc, argv);
 
-    for (int i = 0; ; i++)
+    for (int i = 0;; i++)
     {
         doomgeneric_Tick();
     }
-    
+
 
     return 0;
 }

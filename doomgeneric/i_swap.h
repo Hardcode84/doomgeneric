@@ -26,13 +26,13 @@
 #ifdef __DJGPP__
 
 
-#define SHORT(x)  ((signed short) (x))
-#define LONG(x)   ((signed int) (x))
+#define SHORT(x) ((signed short) (x))
+#define LONG(x)  ((signed int) (x))
 
 #define SYS_LITTLE_ENDIAN
 
 
-#else  // __DJGPP__
+#else // __DJGPP__
 
 
 #include <SDL_endian.h>
@@ -45,8 +45,8 @@
 // These are deliberately cast to signed values; this is the behaviour
 // of the macros in the original source and some code relies on it.
 
-#define SHORT(x)  ((signed short) SDL_SwapLE16(x))
-#define LONG(x)   ((signed int) SDL_SwapLE32(x))
+#define SHORT(x) ((signed short) SDL_SwapLE16(x))
+#define LONG(x)  ((signed int) SDL_SwapLE32(x))
 
 // Defines for checking the endianness of the system.
 
@@ -57,29 +57,28 @@
 #endif
 
 // cosmito from lsdldoom
-#define doom_swap_s(x) \
-        ((short int)((((unsigned short int)(x) & 0x00ff) << 8) | \
-                              (((unsigned short int)(x) & 0xff00) >> 8))) 
+#define doom_swap_s(x)                                                         \
+    ((short int) ((((unsigned short int) (x) & 0x00ff) << 8) |                 \
+                  (((unsigned short int) (x) & 0xff00) >> 8)))
 
 
-#if ( SDL_BYTEORDER == SDL_BIG_ENDIAN )
+#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
 #define doom_wtohs(x) doom_swap_s(x)
 #else
-#define doom_wtohs(x) (short int)(x)
+#define doom_wtohs(x) (short int) (x)
 #endif
 
 
-#endif  // __DJGPP__
+#endif // __DJGPP__
 
 
-#else  // FEATURE_SOUND
-	
-#define SHORT(x)  ((signed short) (x))
-#define LONG(x)   ((signed int) (x))
+#else // FEATURE_SOUND
+
+#define SHORT(x) ((signed short) (x))
+#define LONG(x)  ((signed int) (x))
 
 #define SYS_LITTLE_ENDIAN
 
 #endif /* FEATURE_SOUND */
 
 #endif
-
