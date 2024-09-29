@@ -32,9 +32,9 @@ static inline void _sync_threads()
     {                                                                          \
         static T _local var##_local_temp;                                      \
         if (_get_thread_id_x() == 0)                                           \
-            var_##_local_temp = var;                                           \
+            var##_local_temp = var;                                            \
         _sync_threads();                                                       \
-        var = var_##_local_temp;                                               \
+        var = var##_local_temp;                                                \
     } while (0)
 
 #endif // GPUINTRIN_H
