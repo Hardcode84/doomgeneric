@@ -8,6 +8,10 @@
 static inline uint32_t _get_thread_id_x() {
   return __nvvm_read_ptx_sreg_tid_x();
 }
+
+static inline void _sync_threads() {
+  __syncthreads();
+}
 #endif
 
 #endif // GPUINTRIN_H

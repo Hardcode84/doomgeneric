@@ -2,6 +2,8 @@
 #include <time.h>
 #include <stdio.h>
 
+#include <gpu/rpc.h>
+
 #include "doomkeys.h"
 #include "m_argv.h"
 #include "doomgeneric.h"
@@ -72,7 +74,17 @@ void DG_SetWindowTitle(const char * title)
 
 }
 
-extern void _gpu_host_barrier();
+void* DG_GPU_BarrierEnter PROTECTED_VIS = NULL;
+void* DG_GPU_BarrierExit PROTECTED_VIS = NULL;
+static void _gpu_host_barrier() {
+  _sync_threads();
+  uint32_t thread_id = _get_thread_id_x();
+  if (thread_id == 0) {
+    while(!rpc_host_call(DG_GPU_BarrierEnter, NULL, 0));
+    while(!rpc_host_call(DG_GPU_BarrierExit, NULL, 0));
+  }
+  _sync_threads();
+}
 
 int main(int argc, char **argv, char **envp)
 {
