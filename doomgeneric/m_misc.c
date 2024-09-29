@@ -54,6 +54,21 @@
 
 void M_MakeDirectory(char *path)
 {
+    char buffer[64] = {};
+    size_t size = sizeof(buffer);
+    int total = snprintf(buffer, size, "mkdir \"%s\"", path);
+    if (total > size)
+    {
+        char *temp_buff = malloc(total);
+        snprintf(temp_buff, total, "mkdir \"%s\"", path);
+        system(temp_buff);
+        free(temp_buff);
+    }
+    else
+    {
+        system(buffer);
+    }
+
     // #ifdef _WIN32
     //     mkdir(path);
     // #else
