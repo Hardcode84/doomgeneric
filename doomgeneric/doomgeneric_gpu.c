@@ -107,8 +107,7 @@ int main(int argc, char **argv, char **envp)
             doomgeneric_Tick();
         _gpu_host_barrier();
 
-        if (thread_id == 0)
-            doomgeneric_Draw();
+        doomgeneric_Draw();
         _gpu_host_barrier();
 
         if (thread_id == 0)
