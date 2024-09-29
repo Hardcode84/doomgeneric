@@ -6,6 +6,8 @@
 #include "m_argv.h"
 #include "doomgeneric.h"
 
+#include "gpuintrin.h"
+
 #define NS_IN_MS 1000000L
 
 #define PROTECTED_VIS __attribute__ ((visibility ("protected")))
@@ -74,8 +76,7 @@ extern void _gpu_host_barrier();
 
 int main(int argc, char **argv, char **envp)
 {
-  // uint32_t thread_id = __builtin_amdgcn_workitem_id_x();
-  uint32_t thread_id = __nvvm_read_ptx_sreg_tid_x();
+  uint32_t thread_id = _get_thread_id_x();
   if (thread_id == 0)
   {
     doomgeneric_Create(argc, argv);
