@@ -78,19 +78,24 @@ int main(int argc, char **argv, char **envp)
 {
   uint32_t thread_id = _get_thread_id_x();
   if (thread_id == 0)
-  {
     doomgeneric_Create(argc, argv);
-    _gpu_host_barrier();
 
-    uint32_t time = DG_GetTicksMs();
-    uint32_t last_tick = 0;
-    for (int i = 0; ; i++)
-    {
+  _gpu_host_barrier();
+
+  uint32_t time = DG_GetTicksMs();
+  uint32_t last_tick = 0;
+  for (int i = 0; ; i++)
+  {
+      if (thread_id == 0)
         doomgeneric_Tick();
-        _gpu_host_barrier();
-        doomgeneric_Draw();
-        _gpu_host_barrier();
+      _gpu_host_barrier();
 
+      if (thread_id == 0)
+        doomgeneric_Draw();
+      _gpu_host_barrier();
+
+      if (thread_id == 0)
+      {
         int interval = 10;
         if (i % interval == 0)
         {
@@ -104,8 +109,7 @@ int main(int argc, char **argv, char **envp)
             printf("fps %f\n", fps);
           }
         }
-    }
-    
+      }
   }
 
     return 0;

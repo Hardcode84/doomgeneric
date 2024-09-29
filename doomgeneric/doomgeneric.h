@@ -4,12 +4,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#define SCREEN_RES_MULT 2
+
 #ifndef DOOMGENERIC_RESX
-#define DOOMGENERIC_RESX 640/2
+#define DOOMGENERIC_RESX (320*SCREEN_RES_MULT)
 #endif  // DOOMGENERIC_RESX
 
 #ifndef DOOMGENERIC_RESY
-#define DOOMGENERIC_RESY 400/2
+#define DOOMGENERIC_RESY (200*SCREEN_RES_MULT)
 #endif  // DOOMGENERIC_RESY
 
 
