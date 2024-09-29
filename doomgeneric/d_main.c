@@ -317,18 +317,15 @@ void D_Display(void)
         return;
     }
 
-    static int wipestart_temp;
     if (thread_id == 0)
     {
         // wipe update
         wipe_EndScreen(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
-        wipestart_temp = I_GetTime() - 1;
+        wipestart = I_GetTime() - 1;
     }
-    _sync_threads();
-    wipestart = wipestart_temp;
+    BROADCAST_FROM_THREAD0(wipestart, int);
 
-    static boolean done_temp;
     do
     {
         do
@@ -341,11 +338,10 @@ void D_Display(void)
         wipestart = nowtime;
         if (thread_id == 0)
         {
-            done_temp = wipe_ScreenWipe(wipe_Melt, 0, 0, SCREENWIDTH,
-                                        SCREENHEIGHT, tics);
+            done = wipe_ScreenWipe(wipe_Melt, 0, 0, SCREENWIDTH, SCREENHEIGHT,
+                                   tics);
         }
-        _sync_threads();
-        done = done_temp;
+        BROADCAST_FROM_THREAD0(done, boolean);
         I_UpdateNoBlit();
         M_Drawer();       // menu is drawn even on top of wipes
         I_FinishUpdate(); // page flip or blit buffer
