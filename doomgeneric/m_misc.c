@@ -54,6 +54,10 @@
 
 void M_MakeDirectory(char *path)
 {
+
+#ifdef _WIN32
+    mkdir(path);
+#elif defined(__AMDGPU__) || defined(__NVPTX__)
     char buffer[64] = {};
     size_t size = sizeof(buffer);
     int total = snprintf(buffer, size, "mkdir \"%s\"", path);
@@ -68,12 +72,9 @@ void M_MakeDirectory(char *path)
     {
         system(buffer);
     }
-
-    // #ifdef _WIN32
-    //     mkdir(path);
-    // #else
-    //     mkdir(path, 0755);
-    // #endif
+#else
+    mkdir(path, 0755);
+#endif
 }
 
 // Check if a file exists
